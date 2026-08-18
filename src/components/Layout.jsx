@@ -62,7 +62,7 @@ export default function Layout({ children }) {
 
           {/* Desktop Nav Links */}
           <ul className="hidden md:flex space-x-8 text-white/90">
-            {['Home', 'Work', 'Vision', 'Timeline', 'Team'].map((sec) => (
+            {['Home', 'Work', 'Vision', 'Timeline'].map((sec) => (
               <li
                 key={sec}
                 className="hover:text-white transition-colors relative group overflow-hidden"
@@ -74,7 +74,7 @@ export default function Layout({ children }) {
                   className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 ease-in-out group-hover:w-full ${
                     sec === 'Home' || sec === 'Timeline'
                       ? 'bg-neon-blue'
-                      : sec === 'Work' || sec === 'Team'
+                      : sec === 'Work'
                       ? 'bg-neon-purple'
                       : 'bg-neon-pink'
                   }`}
@@ -100,7 +100,7 @@ export default function Layout({ children }) {
             style={{ height: '100vh', top: 0 }}
           >
             <ul className="flex flex-col space-y-6 text-center text-white text-xl max-h-[80vh] overflow-y-auto py-12">
-              {['Home', 'Work', 'Vision', 'Timeline', 'Team'].map((sec) => (
+              {['Home', 'Work', 'Vision', 'Timeline'].map((sec) => (
                 <li key={sec}>
                   <a
                     href={`#${sec.toLowerCase()}`}
