@@ -137,8 +137,8 @@ export default function Vision() {
       });
     }, { threshold: 0.05 });
 
-    if (canvasContainerRef.current) {
-      observer.observe(canvasContainerRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
 
     let animationFrameId;

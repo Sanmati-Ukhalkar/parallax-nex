@@ -142,8 +142,8 @@ export default function Hero() {
       });
     }, { threshold: 0.05 });
 
-    if (canvasContainerRef.current) {
-      observer.observe(canvasContainerRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
 
     // 5. Resize handler

@@ -102,8 +102,8 @@ export default function Work() {
       });
     }, { threshold: 0.05 });
 
-    if (canvasRef.current) {
-      observer.observe(canvasRef.current);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
 
     let frameId;
