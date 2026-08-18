@@ -4,6 +4,7 @@ import Hero from './components/Hero.jsx';
 import Work from './components/Work.jsx';
 import Vision from './components/Vision.jsx';
 import Timeline from './components/Timeline.jsx';
+import SEO from './components/SEO.jsx';
 
 export default function App() {
   // Smooth scroll for hash links
@@ -33,6 +34,7 @@ export default function App() {
 
   return (
     <Layout>
+      <SEO />
       <Hero />
       <Work />
       <Vision />

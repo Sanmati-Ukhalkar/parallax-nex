@@ -1,23 +1,53 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
+  const containerRef = useRef(null);
   const textRef = useRef(null);
   const canvasContainerRef = useRef(null);
 
-  useEffect(() => {
-    // Scroll Parallax Effect
-    const handleScroll = () => {
-      if (!textRef.current) return;
-      const scrollY = window.scrollY;
-      const opacity = 1 - Math.min(1, scrollY / 700);
-      textRef.current.style.opacity = opacity.toString();
-      textRef.current.style.transform = `translateY(${scrollY * 0.5}px)`;
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // GSAP animations
+  useGSAP(() => {
+    // 1. Entrance animation
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 1 } });
+    
+    tl.fromTo('.animate-badge', { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, delay: 0.3 })
+      .fromTo('.animate-title span', { y: 60, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.2 }, '-=0.5')
+      .fromTo('.animate-desc', { opacity: 0, y: 30 }, { opacity: 1, y: 0 }, '-=0.5')
+      .fromTo('.animate-btns a', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.15 }, '-=0.5');
 
+    // 2. Parallax and Fade out on scroll
+    gsap.to('.hero-content-wrap', {
+      scrollTrigger: {
+        trigger: '#home',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      },
+      opacity: 0,
+      y: 150,
+      ease: 'none'
+    });
+
+    gsap.to('.hero-3d-wrap', {
+      scrollTrigger: {
+        trigger: '#home',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true
+      },
+      opacity: 0,
+      y: 80,
+      ease: 'none'
+    });
+  }, { scope: containerRef });
+
+  // Three.js wireframe Icosahedron animation
   useEffect(() => {
     if (!canvasContainerRef.current) return;
 
@@ -133,9 +163,6 @@ export default function Hero() {
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
-      if (canvasContainerRef.current && renderer.domElement) {
-        canvasContainerRef.current.removeChild(renderer.domElement);
-      }
       geometry.dispose();
       wireframeMat.dispose();
       solidMat.dispose();
@@ -148,11 +175,12 @@ export default function Hero() {
   return (
     <section
       id="home"
+      ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-dark-lighter to-dark"
     >
       {/* Background patterns */}
       <div className="absolute inset-0 bg-grid-pattern opacity-100 -z-10" />
-      <div ref={canvasContainerRef} className="absolute inset-0 -z-5 pointer-events-none" />
+      <div ref={canvasContainerRef} className="absolute inset-0 -z-5 pointer-events-none hero-3d-wrap" />
       
       {/* Ambient background glows */}
       <div className="absolute inset-0 flex items-center justify-center -z-10">
@@ -163,32 +191,32 @@ export default function Hero() {
       {/* Main Hero Header */}
       <div
         ref={textRef}
-        className="container mx-auto px-6 z-10 text-center transition-all duration-300 ease-out"
+        className="container mx-auto px-6 z-10 text-center hero-content-wrap"
       >
         <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="inline-block py-1 px-3 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-6 animate-fade-in">
-            <span className="text-sm font-medium text-white/80">Collaborative Innovation</span>
+          <div className="animate-badge inline-block py-1 px-3 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-6 opacity-0">
+            <span className="text-sm font-medium text-white/80">Startup Innovation Partner</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
-            <span className="block">Shaping the Future of</span>
-            <span className="text-gradient block mt-2">Design & AI</span>
+          <h1 className="animate-title text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
+            <span className="block opacity-0">Shaping the Future of</span>
+            <span className="text-gradient block mt-2 opacity-0">Design & Technology</span>
           </h1>
           
-          <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            Parallax Global and Nexmize AI join forces to create a new paradigm in digital experiences and intelligent software solutions.
+          <p className="animate-desc text-xl text-white/70 max-w-2xl mx-auto opacity-0">
+            Parallax Global delivers premium digital design, custom software development, and virtual reality experiences. We build cutting-edge products to scale your startup venture.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+          <div className="animate-btns flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
             <a
               href="#work"
-              className="w-full sm:w-auto px-8 py-3 rounded-md bg-gradient-to-r from-neon-blue to-neon-purple hover:opacity-90 text-white font-medium transition-all duration-300 shadow-lg shadow-neon-blue/20"
+              className="animate-btn-work w-full sm:w-auto px-8 py-3 rounded-md bg-gradient-to-r from-neon-blue to-neon-purple hover:opacity-90 text-white font-medium transition-all duration-300 shadow-lg shadow-neon-blue/20 opacity-0"
             >
               Explore Work
             </a>
             <a
               href="#contact"
-              className="w-full sm:w-auto px-8 py-3 rounded-md border border-white/20 hover:bg-white/10 text-white font-medium transition-colors duration-300"
+              className="animate-btn-contact w-full sm:w-auto px-8 py-3 rounded-md border border-white/20 hover:bg-white/10 text-white font-medium transition-colors duration-300 opacity-0"
             >
               Get in Touch
             </a>

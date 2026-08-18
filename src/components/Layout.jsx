@@ -54,10 +54,10 @@ export default function Layout({ children }) {
           <div className="text-white flex items-center space-x-2">
             <img
               src={pgLogo}
-              alt="ParallaxNex Logo"
+              alt="Parallax Global Logo"
               className="h-10 w-10 rounded-full object-contain"
             />
-            <span className="text-xl font-bold">ParallaxNex</span>
+            <span className="text-xl font-bold">Parallax Global</span>
           </div>
 
           {/* Desktop Nav Links */}
@@ -141,41 +141,25 @@ export default function Layout({ children }) {
       {/* Footer */}
       <footer className="bg-dark-lighter pt-20 pb-10 relative overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
             <div>
               <div className="flex items-center space-x-2 mb-6">
                 <img
                   src={pgLogo}
-                  alt="ParallaxNex Logo"
+                  alt="Parallax Global Logo"
                   className="h-10 w-10 rounded-full object-contain"
                 />
-                <span className="text-xl font-bold">ParallaxNex</span>
+                <span className="text-xl font-bold">Parallax Global</span>
               </div>
               <p className="text-white/60 text-sm mb-6">
-                A collaborative partnership between Parallax Global and Nexmize AI, delivering
-                innovative solutions at the intersection of design and artificial intelligence.
+                Premium digital design, custom software development, and immersive virtual reality experiences. We build cutting-edge digital products for forward-thinking startups and ventures.
               </p>
             </div>
 
             <div>
-              <h4 className="text-white font-bold mb-6">Parallax Global</h4>
+              <h4 className="text-white font-bold mb-6">Services</h4>
               <ul className="space-y-4">
                 {['Design Services', 'UX Research', 'Virtual Reality', 'Development', 'Case Studies'].map(
-                  (link) => (
-                    <li key={link}>
-                      <a href="#" className="text-white/60 hover:text-white transition-colors text-sm">
-                        {link}
-                      </a>
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-6">Nexmize AI</h4>
-              <ul className="space-y-4">
-                {['AI Solutions', 'Machine Learning', 'Data Analytics', 'Research Papers', 'AI Ethics'].map(
                   (link) => (
                     <li key={link}>
                       <a href="#" className="text-white/60 hover:text-white transition-colors text-sm">

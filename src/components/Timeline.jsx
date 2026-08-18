@@ -1,101 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const timelineEvents = [
   {
     year: "2022",
     title: "Foundation of Parallax Global",
-    description: "Parallax Global was founded with a mission to provide high-quality offline programming classes, covering C, C++, Java, and Web Development.",
-    companyType: "parallax"
+    description: "Parallax Global was founded with a mission to deliver high-quality offline programming classes, covering core languages like C, C++, Java, and Modern Web Development."
   },
   {
     year: "2023",
-    title: "Foundation of Nexmize",
-    description: "Nexmize was founded with a focus on AI, starting by sharing informative posts about AI advancements and trends.",
-    companyType: "nexmize"
-  },
-  {
-    year: "2023",
-    title: "Client Projects",
-    description: "Parallax Global began working on small-scale client projects, building experience in software development.",
-    companyType: "parallax"
+    title: "Venture Scale Client Projects",
+    description: "Expanded our offerings beyond education to full-service software product design, securing our first custom app design and web developments contracts."
   },
   {
     year: "2024",
-    title: "Client Acquisition and AI Solutions",
-    description: "Nexmize secured its first clients, helping businesses improve efficiency with AI-driven solutions like bots and automation.",
-    companyType: "nexmize"
-  },
-  {
-    year: "2024",
-    title: "Expansion and Growth",
-    description: "Parallax Global expanded its client base, successfully managing an increased number of projects and enhancing service quality.",
-    companyType: "parallax"
+    title: "VR & Immersive Media Launch",
+    description: "Pioneered virtual reality environments and interactive 3D media applications, establishing our studio at the forefront of immersive tech."
   },
   {
     year: "2025",
-    title: "Breakthrough in AI Innovation",
-    description: "Nexmize developed and deployed live voice recognition AI projects, showcasing its technical strength and market impact.",
-    companyType: "nexmize"
-  },
-  {
-    year: "2025",
-    title: "Handling Big Clients",
-    description: "Parallax Global secured major clients and started handling complex, large-scale projects — setting the stage for future growth.",
-    companyType: "parallax"
+    title: "Scale to Enterprise Software",
+    description: "Secured enterprise level contracts, developing highly scalable automation software, responsive digital portals, and cloud solutions."
   }
 ];
 
-// Helper card component
-function MilestoneCard({ year, title, description, isLeft, index, companyType, isMobile }) {
+function MilestoneCard({ year, title, description, isLeft, isMobile }) {
   return (
     <div
-      className={`relative z-10 transition-all duration-700 ease-out opacity-0 translate-y-6 ${
-        isLeft && !isMobile ? 'md:text-right' : ''
+      className={`timeline-event-card relative z-10 opacity-0 mb-12 flex flex-col ${
+        isLeft && !isMobile ? 'md:items-end' : 'md:items-start'
       }`}
-      style={{
-        animationName: 'fade-in-up',
-        animationDuration: '0.6s',
-        animationFillMode: 'forwards',
-        animationDelay: `${index * 200}ms`
-      }}
     >
       {/* Node Dot indicator */}
-      {!isMobile && (
-        <div
-          className={`hidden md:block absolute top-0 w-3 h-3 rounded-full ${
-            companyType === 'parallax' ? 'bg-neon-blue' : 'bg-neon-purple'
-          } ${isLeft ? '-right-1.5' : '-left-1.5'}`}
-        />
-      )}
-      {isMobile && (
-        <div
-          className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full z-10 ${
-            companyType === 'parallax' ? 'bg-neon-blue' : 'bg-neon-purple'
-          } ${companyType === 'parallax' ? '-right-1.5' : '-left-1.5'}`}
-        />
-      )}
+      <div
+        className={`hidden md:block absolute top-6 w-4 h-4 rounded-full bg-neon-blue border-2 border-dark z-20 ${
+          isLeft ? 'left-[calc(50%-8px)]' : 'right-[calc(50%-8px)]'
+        }`}
+      />
 
       {/* Card Body */}
       <div
-        className={`p-6 max-w-md glass rounded-xl mb-10 ${isLeft && !isMobile ? 'md:ml-auto' : ''} ${
-          companyType === 'parallax' ? 'border-l-2 border-neon-blue/30' : 'border-l-2 border-neon-purple/30'
+        className={`p-6 max-w-lg glass rounded-xl border-l-2 border-neon-blue/30 w-full ${
+          isLeft && !isMobile ? 'md:text-right' : 'md:text-left'
         }`}
       >
-        <div
-          className={`inline-block py-1 px-3 rounded-full backdrop-blur-md mb-3 ${
-            companyType === 'parallax' ? 'bg-neon-blue/10' : 'bg-neon-purple/10'
-          }`}
-        >
+        <div className="inline-block py-1 px-3 rounded-full bg-neon-blue/10 backdrop-blur-md mb-3">
           <span className="text-xs font-semibold text-white/90">{year}</span>
         </div>
-        <h3
-          className={`text-xl font-bold mb-2 ${
-            companyType === 'parallax' ? 'text-neon-blue' : 'text-neon-purple'
-          }`}
-        >
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold mb-2 text-neon-blue">{title}</h3>
         <p className="text-white/70 text-sm leading-relaxed">{description}</p>
       </div>
     </div>
@@ -103,7 +60,7 @@ function MilestoneCard({ year, title, description, isLeft, index, companyType, i
 }
 
 export default function Timeline() {
-  const lineRef = useRef(null);
+  const containerRef = useRef(null);
   const canvasContainerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -116,7 +73,43 @@ export default function Timeline() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Three.js floating particles animation
+  // GSAP ScrollTrigger timeline animation
+  useGSAP(() => {
+    // Scrub the height of the line progress
+    gsap.fromTo('.timeline-progress-bar',
+      { height: '0%' },
+      {
+        scrollTrigger: {
+          trigger: '.timeline-events-container',
+          start: 'top 30%',
+          end: 'bottom 70%',
+          scrub: true
+        },
+        height: '100%',
+        ease: 'none'
+      }
+    );
+
+    // Stagger fade-in each milestone card
+    gsap.utils.toArray('.timeline-event-card').forEach((card) => {
+      gsap.fromTo(card,
+        { opacity: 0, y: 50 },
+        {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.out'
+        }
+      );
+    });
+  }, { scope: containerRef });
+
+  // Three.js floating background particles
   useEffect(() => {
     if (!canvasContainerRef.current) return;
 
@@ -129,8 +122,7 @@ export default function Timeline() {
     renderer.setPixelRatio(window.devicePixelRatio);
     canvasContainerRef.current.appendChild(renderer.domElement);
 
-    // Create particles data
-    const count = 100;
+    const count = 80;
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
 
@@ -139,27 +131,23 @@ export default function Timeline() {
       positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
 
-      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3] = (Math.random() - 0.5) * 0.015;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.015;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.015;
     }
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // Three colored particle styles
-    const materials = [
-      new THREE.PointsMaterial({ size: 0.1, color: 0x00F3FF, transparent: true, opacity: 0.8 }), // blue
-      new THREE.PointsMaterial({ size: 0.1, color: 0xAE00FF, transparent: true, opacity: 0.8 }), // purple
-      new THREE.PointsMaterial({ size: 0.1, color: 0xFF00AA, transparent: true, opacity: 0.8 }), // pink
-    ];
+    const material = new THREE.PointsMaterial({
+      size: 0.1,
+      color: 0x00F3FF,
+      transparent: true,
+      opacity: 0.6
+    });
 
-    const particleSystems = [];
-    for (let i = 0; i < 3; i++) {
-      const system = new THREE.Points(geometry.clone(), materials[i]);
-      scene.add(system);
-      particleSystems.push(system);
-    }
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
 
     const handleResize = () => {
       const width = window.innerWidth;
@@ -173,23 +161,19 @@ export default function Timeline() {
     const animate = () => {
       frameId = requestAnimationFrame(animate);
 
-      // Move particle positions
-      particleSystems.forEach((system, index) => {
-        const arr = system.geometry.attributes.position.array;
-        for (let i = 0; i < count; i++) {
-          const idx = i * 3;
-          arr[idx] += velocities[idx];
-          arr[idx + 1] += velocities[idx + 1];
-          arr[idx + 2] += velocities[idx + 2];
+      const arr = geometry.attributes.position.array;
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        arr[idx] += velocities[idx];
+        arr[idx + 1] += velocities[idx + 1];
+        arr[idx + 2] += velocities[idx + 2];
 
-          // Bounce if boundary crossed
-          if (Math.abs(arr[idx]) > 5) velocities[idx] = -velocities[idx] * 0.8;
-          if (Math.abs(arr[idx + 1]) > 5) velocities[idx + 1] = -velocities[idx + 1] * 0.8;
-          if (Math.abs(arr[idx + 2]) > 5) velocities[idx + 2] = -velocities[idx + 2] * 0.8;
-        }
-        system.geometry.attributes.position.needsUpdate = true;
-        system.rotation.y += 0.001 * (index + 1);
-      });
+        if (Math.abs(arr[idx]) > 5) velocities[idx] = -velocities[idx] * 0.8;
+        if (Math.abs(arr[idx + 1]) > 5) velocities[idx + 1] = -velocities[idx + 1] * 0.8;
+        if (Math.abs(arr[idx + 2]) > 5) velocities[idx + 2] = -velocities[idx + 2] * 0.8;
+      }
+      geometry.attributes.position.needsUpdate = true;
+      particles.rotation.y += 0.001;
 
       renderer.render(scene, camera);
     };
@@ -202,34 +186,13 @@ export default function Timeline() {
         canvasContainerRef.current.removeChild(renderer.domElement);
       }
       geometry.dispose();
-      materials.forEach((m) => m.dispose());
+      material.dispose();
       renderer.dispose();
     };
   }, []);
 
-  // IntersectionObserver for Growing Timeline Line (Desktop only)
-  useEffect(() => {
-    const line = lineRef.current;
-    if (!line) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            line.classList.add('after:h-full');
-            line.classList.remove('after:h-0');
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(line);
-    return () => observer.unobserve(line);
-  }, []);
-
   return (
-    <section id="timeline" className="relative py-24 bg-dark-lighter overflow-hidden">
+    <section id="timeline" ref={containerRef} className="relative py-24 bg-dark-lighter overflow-hidden">
       {/* 3D background particles container */}
       <div ref={canvasContainerRef} className="absolute inset-0 opacity-40 pointer-events-none" />
 
@@ -240,77 +203,55 @@ export default function Timeline() {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gradient mb-6">Timeline of Innovation</h2>
           <p className="text-white/70 max-w-2xl mx-auto">
-            Explore the key milestones that have shaped our collaborative journey in pioneering innovative solutions and transforming industries.
+            Explore the key milestones of Parallax Global as we pioneer cutting-edge tech experiences.
           </p>
         </div>
 
-        <div className="relative">
-          {/* Central Line for Desktop */}
-          {!isMobile && (
-            <div
-              ref={lineRef}
-              className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-px bg-white/20 after:absolute after:top-0 after:left-0 after:right-0 after:h-0 after:bg-gradient-to-b after:from-neon-blue after:via-neon-purple after:to-neon-pink after:transition-all after:duration-[2000ms] after:ease-in-out"
-            />
-          )}
-
-          {/* Central indicator line for Mobile */}
-          {isMobile && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full flex flex-col">
-              <div className="w-px h-full bg-gradient-to-b from-neon-blue via-white/20 to-neon-purple" />
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-dark-lighter border-2 border-white/20 flex items-center justify-center z-20">
-                  <div className="w-3 h-3 rounded-full bg-white" />
-                </div>
-                <div className="bg-dark-lighter px-3 py-1 rounded-full border border-white/10 mt-2 text-xs text-white/70">
-                  Partnership
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="relative timeline-events-container max-w-5xl mx-auto">
+          {/* Vertical central indicator line */}
+          <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 h-full w-px bg-white/10 z-0">
+            <div className="timeline-progress-bar w-full h-0 bg-gradient-to-b from-neon-blue via-neon-purple to-neon-pink transition-all duration-100 ease-out" />
+          </div>
 
           {/* Milestones rendering */}
-          {isMobile ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4 pr-4">
-                {timelineEvents
-                  .filter((e) => e.companyType === 'parallax')
-                  .map((e, idx) => (
-                    <MilestoneCard
-                      key={`parallax-${idx}`}
-                      {...e}
-                      isLeft={false}
-                      index={idx}
-                      isMobile={true}
-                    />
-                  ))}
-              </div>
-              <div className="space-y-4 pl-4">
-                {timelineEvents
-                  .filter((e) => e.companyType === 'nexmize')
-                  .map((e, idx) => (
-                    <MilestoneCard
-                      key={`nexmize-${idx}`}
-                      {...e}
-                      isLeft={true}
-                      index={idx}
-                      isMobile={true}
-                    />
-                  ))}
-              </div>
-            </div>
-          ) : (
-            <div className="md:grid md:grid-cols-2 md:gap-x-12">
-              {timelineEvents.map((e, idx) => (
-                <MilestoneCard
+          <div className="relative pl-10 md:pl-0">
+            {timelineEvents.map((e, idx) => {
+              const isLeft = idx % 2 === 0;
+              return (
+                <div
                   key={idx}
-                  {...e}
-                  isLeft={idx % 2 === 0}
-                  index={idx}
-                  isMobile={false}
-                />
-              ))}
-            </div>
-          )}
+                  className={`flex flex-col md:grid md:grid-cols-2 md:gap-8 ${
+                    isLeft ? '' : 'md:flex-row-reverse'
+                  }`}
+                >
+                  {/* Left Column (Desktop) */}
+                  <div className={`${isLeft ? 'block' : 'md:hidden'}`}>
+                    {isLeft && (
+                      <MilestoneCard
+                        {...e}
+                        isLeft={true}
+                        isMobile={isMobile}
+                      />
+                    )}
+                  </div>
+
+                  {/* Empty Column spacer (Desktop) */}
+                  <div className="hidden md:block" />
+
+                  {/* Right Column (Desktop) */}
+                  <div className={`${!isLeft ? 'block' : 'md:hidden'}`}>
+                    {!isLeft && (
+                      <MilestoneCard
+                        {...e}
+                        isLeft={false}
+                        isMobile={isMobile}
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

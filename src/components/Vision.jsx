@@ -1,5 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const visionCards = [
   {
@@ -41,12 +46,35 @@ const visionCards = [
 ];
 
 export default function Vision() {
+  const containerRef = useRef(null);
   const canvasContainerRef = useRef(null);
 
+  // GSAP ScrollTrigger for cards
+  useGSAP(() => {
+    gsap.fromTo('.vision-card',
+      {
+        opacity: 0,
+        y: 60
+      },
+      {
+        scrollTrigger: {
+          trigger: '.vision-grid',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: 'power3.out'
+      }
+    );
+  }, { scope: containerRef });
+
+  // Three.js interactive 3D solar system
   useEffect(() => {
     if (!canvasContainerRef.current) return;
 
-    // 1. Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
     camera.position.z = 5;
@@ -56,7 +84,6 @@ export default function Vision() {
     renderer.setPixelRatio(window.devicePixelRatio);
     canvasContainerRef.current.appendChild(renderer.domElement);
 
-    // 2. Glowing Ring Maker Helper
     const createRing = (radius, color) => {
       const geometry = new THREE.RingGeometry(radius, radius + 0.05, 64);
       const material = new THREE.MeshBasicMaterial({
@@ -80,7 +107,6 @@ export default function Vision() {
     scene.add(ring2);
     scene.add(ring3);
 
-    // 3. Orbiting Sphere Maker Helper
     const createSphere = (color) => {
       const geometry = new THREE.SphereGeometry(0.15, 32, 32);
       const material = new THREE.MeshBasicMaterial({ color: color });
@@ -95,7 +121,6 @@ export default function Vision() {
     scene.add(sphere2);
     scene.add(sphere3);
 
-    // 4. Central Sun Sphere
     const sunGeom = new THREE.SphereGeometry(0.5, 32, 32);
     const sunMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
@@ -105,18 +130,15 @@ export default function Vision() {
     const sunMesh = new THREE.Mesh(sunGeom, sunMat);
     scene.add(sunMesh);
 
-    // 5. Animation Loop
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       const time = Date.now() * 0.001;
 
-      // Rotate Rings
       ring1.rotation.z = time * 0.2;
       ring2.rotation.z = time * 0.15;
       ring3.rotation.z = time * 0.1;
 
-      // Position Orbiters
       sphere1.position.x = Math.cos(time) * 1.5;
       sphere1.position.z = Math.sin(time) * 1.5;
 
@@ -126,7 +148,6 @@ export default function Vision() {
       sphere3.position.x = Math.cos(time * 0.6) * 3.5;
       sphere3.position.z = Math.sin(time * 0.6) * 3.5;
 
-      // Pulsate Sun
       const scale = 1 + Math.sin(time * 2) * 0.1;
       sunMesh.scale.set(scale, scale, scale);
 
@@ -158,10 +179,10 @@ export default function Vision() {
   }, []);
 
   return (
-    <section id="vision" className="relative py-24 bg-dark overflow-hidden">
+    <section id="vision" ref={containerRef} className="relative py-24 bg-dark overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <div className="inline-block py-1 px-3 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-4 animate-fade-in">
+          <div className="inline-block py-1 px-3 rounded-full bg-white/5 backdrop-blur-md border border-white/10 mb-4">
             <span className="text-sm font-medium text-white/80">Future Vision</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gradient mb-6">Pioneering Tomorrow's Technology</h2>
@@ -180,12 +201,11 @@ export default function Vision() {
 
           {/* Cards listing */}
           <div className="lg:w-3/5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="vision-grid grid grid-cols-1 md:grid-cols-2 gap-6">
               {visionCards.map((card, idx) => (
                 <div
                   key={idx}
-                  className="glass rounded-xl p-6 h-full transition-all duration-500 hover:translate-y-[-8px] animate-fade-in-up"
-                  style={{ animationDelay: `${idx * 150}ms` }}
+                  className="vision-card glass rounded-xl p-6 h-full transition-all duration-500 hover:translate-y-[-8px] opacity-0"
                 >
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
