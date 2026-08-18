@@ -196,10 +196,17 @@ export default function Hero() {
       <div className="absolute inset-0 bg-grid-pattern opacity-100 -z-10" />
       <div ref={canvasContainerRef} className="absolute inset-0 -z-5 pointer-events-none hero-3d-wrap" />
       
-      {/* Ambient background glows */}
+      {/* Ambient background glows and moving objects */}
       <div className="absolute inset-0 flex items-center justify-center -z-10">
         <div className="absolute w-[500px] h-[500px] rounded-full bg-neon-purple/10 blur-[120px]" />
         <div className="absolute w-[600px] h-[600px] rounded-full bg-neon-blue/10 blur-[120px] -translate-x-1/4" />
+        <div className="absolute inset-0 bg-dark/40" />
+        <div className="absolute top-1/4 left-10 w-4 h-4 bg-white/10 rounded-sm animate-pulse" />
+        <div className="absolute top-1/3 right-20 w-8 h-8 bg-white/5 rounded-md animate-bounce" />
+        <div className="absolute bottom-1/4 left-1/3 w-6 h-6 bg-white/10 rounded-sm animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-5 h-5 bg-white/5 rounded-md animate-bounce" />
+        <div className="absolute top-10 left-1/2 w-12 h-12 bg-white/[0.02] rounded-lg animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-16 h-16 bg-white/[0.03] rounded-xl animate-pulse" />
       </div>
 
       {/* Main Hero Header */}
