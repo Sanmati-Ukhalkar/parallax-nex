@@ -24,7 +24,7 @@ export default function Hero() {
     // 2. Parallax and Fade out on scroll
     gsap.to('.hero-content-wrap', {
       scrollTrigger: {
-        trigger: '#home',
+        trigger: containerRef.current,
         start: 'top top',
         end: 'bottom top',
         scrub: true
@@ -36,7 +36,7 @@ export default function Hero() {
 
     gsap.to('.hero-3d-wrap', {
       scrollTrigger: {
-        trigger: '#home',
+        trigger: containerRef.current,
         start: 'top top',
         end: 'bottom top',
         scrub: true
@@ -134,6 +134,18 @@ export default function Hero() {
     const starField = new THREE.Points(particlesGeom, particlesMat);
     scene.add(starField);
 
+    // Visibility Observer to pause renderer when scrolled out
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisible = entry.isIntersecting;
+      });
+    }, { threshold: 0.05 });
+
+    if (canvasContainerRef.current) {
+      observer.observe(canvasContainerRef.current);
+    }
+
     // 5. Resize handler
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -146,6 +158,7 @@ export default function Hero() {
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (!isVisible) return; // Skip rendering when out of viewport
 
       wireframeMesh.rotation.y += 0.002;
       wireframeMesh.rotation.z += 0.001;
@@ -163,6 +176,7 @@ export default function Hero() {
     return () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
       geometry.dispose();
       wireframeMat.dispose();
       solidMat.dispose();

@@ -149,6 +149,17 @@ export default function Timeline() {
     const particles = new THREE.Points(geometry, material);
     scene.add(particles);
 
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisible = entry.isIntersecting;
+      });
+    }, { threshold: 0.05 });
+
+    if (canvasContainerRef.current) {
+      observer.observe(canvasContainerRef.current);
+    }
+
     const handleResize = () => {
       const width = window.innerWidth;
       camera.aspect = width / 600;
@@ -160,6 +171,7 @@ export default function Timeline() {
     let frameId;
     const animate = () => {
       frameId = requestAnimationFrame(animate);
+      if (!isVisible) return; // Skip rendering when out of viewport
 
       const arr = geometry.attributes.position.array;
       for (let i = 0; i < count; i++) {
@@ -182,6 +194,7 @@ export default function Timeline() {
     return () => {
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       if (canvasContainerRef.current && renderer.domElement) {
         canvasContainerRef.current.removeChild(renderer.domElement);
       }

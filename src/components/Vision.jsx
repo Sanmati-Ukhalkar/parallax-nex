@@ -130,9 +130,21 @@ export default function Vision() {
     const sunMesh = new THREE.Mesh(sunGeom, sunMat);
     scene.add(sunMesh);
 
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisible = entry.isIntersecting;
+      });
+    }, { threshold: 0.05 });
+
+    if (canvasContainerRef.current) {
+      observer.observe(canvasContainerRef.current);
+    }
+
     let animationFrameId;
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (!isVisible) return; // Skip rendering when out of viewport
       const time = Date.now() * 0.001;
 
       ring1.rotation.z = time * 0.2;
@@ -157,6 +169,7 @@ export default function Vision() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
       if (canvasContainerRef.current && renderer.domElement) {
         canvasContainerRef.current.removeChild(renderer.domElement);
       }

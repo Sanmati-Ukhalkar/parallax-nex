@@ -95,9 +95,21 @@ export default function Work() {
     const cubeLines = new THREE.LineSegments(edges, material);
     scene.add(cubeLines);
 
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisible = entry.isIntersecting;
+      });
+    }, { threshold: 0.05 });
+
+    if (canvasRef.current) {
+      observer.observe(canvasRef.current);
+    }
+
     let frameId;
     const animate = () => {
       frameId = requestAnimationFrame(animate);
+      if (!isVisible) return; // Skip rendering when out of viewport
       cubeLines.rotation.x += 0.01;
       cubeLines.rotation.y += 0.01;
       renderer.render(scene, camera);
@@ -106,6 +118,7 @@ export default function Work() {
 
     return () => {
       cancelAnimationFrame(frameId);
+      observer.disconnect();
       geometry.dispose();
       edges.dispose();
       material.dispose();

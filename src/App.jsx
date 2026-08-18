@@ -17,8 +17,10 @@ export default function App() {
         if (!targetId) return;
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
+          const rect = targetElement.getBoundingClientRect();
+          const scrollTop = rect.top + window.pageYOffset;
           window.scrollTo({
-            top: targetElement.offsetTop,
+            top: scrollTop,
             behavior: 'smooth'
           });
         }

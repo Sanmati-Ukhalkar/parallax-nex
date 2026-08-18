@@ -19,24 +19,42 @@ export default function Layout({ children }) {
     const cursor = cursorRef.current;
     if (!cursor) return;
 
-    const handleMouseMove = (e) => {
-      cursor.style.left = `${e.clientX}px`;
-      cursor.style.top = `${e.clientY}px`;
+    let cursorX = -100;
+    let cursorY = -100;
 
-      const target = document.elementFromPoint(e.clientX, e.clientY);
-      if (target?.closest('a, button, [role="button"]')) {
-        cursor.style.width = '40px';
-        cursor.style.height = '40px';
-        cursor.style.backgroundColor = 'rgba(174, 0, 255, 0.2)'; // Neon Purple
-      } else {
+    const handleMouseMove = (e) => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    };
+
+    const handleMouseOver = (e) => {
+      const target = e.target;
+      if (target && target.closest('a, button, [role="button"], input, select, textarea')) {
+        cursor.style.width = '48px';
+        cursor.style.height = '48px';
+        cursor.style.backgroundColor = 'rgba(174, 0, 255, 0.25)'; // Neon Purple
+      }
+    };
+
+    const handleMouseOut = (e) => {
+      const target = e.target;
+      if (target && target.closest('a, button, [role="button"], input, select, textarea')) {
         cursor.style.width = '32px';
         cursor.style.height = '32px';
         cursor.style.backgroundColor = 'rgba(0, 243, 255, 0.2)'; // Neon Blue
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver);
+    window.addEventListener('mouseout', handleMouseOut);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseover', handleMouseOver);
+      window.removeEventListener('mouseout', handleMouseOut);
+    };
   }, []);
 
   return (
@@ -112,7 +130,7 @@ export default function Layout({ children }) {
                 </li>
               ))}
             </ul>
-            <div className="mt-8">
+            <div className="mt-8 flex justify-center w-full">
               <a
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
